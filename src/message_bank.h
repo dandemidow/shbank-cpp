@@ -22,8 +22,9 @@ public:
     typedef User user_type;
 
     template<class TagType>
-    message_bank(shared_memory &mem,TagType tag,std::size_t size = 2) : mem(mem){
-        bank = user_type::init_bank(mem,tag,size);
+    message_bank(shared_memory &mem,TagType tag,std::size_t size = 2)
+      : mem(mem),
+        bank(user_type::init_bank(mem,tag,size)){
     }
     void wait_connect(){
         user_type::connect(mem);

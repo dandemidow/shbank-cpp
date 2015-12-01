@@ -25,6 +25,7 @@ public:
         message res;
         res.msg = (msgblk_t*)malloc(sizeof(*msg));
         std::memcpy(res.msg,msg,sizeof(*msg));
+        return res;
     }
 private:
 

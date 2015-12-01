@@ -3,8 +3,9 @@
 #include <string>
 #include <cstring>
 
-#include <shmobank/bank.h>
+extern "C" {
 #include <shmobank/monmsg.h>
+}
 
 class shared_memory{
     shared_mem_t *mem;
