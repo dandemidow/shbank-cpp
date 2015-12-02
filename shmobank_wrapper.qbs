@@ -15,10 +15,13 @@ Project {
             qbs.install: true
             qbs.installDir: "/usr/include/shmobank++"
             files: [
-                "src/message_bank.h",
-                "src/shared_memory.h",
+                "src/bank.h",
+                "src/memory.h",
                 "src/user_types.h",
+                "src/msgpolicy.h",
                 "src/message.h",
+                "src/producer.h",
+                "src/consumer.h"
             ]
         }
         Group {
@@ -31,8 +34,8 @@ Project {
         cpp.cxxFlags: "-std=c++11"
         name: "tst_shmobank++"
         type: ["application"]
-        cpp.staticLibraries: [ "shmobank", "sharedmem", "gpio" ]
-        cpp.dynamicLibraries: ["pthread", "asound", "check", "rt", "boost_unit_test_framework","boost_system"]
+        cpp.staticLibraries: [ "shmobank", "sharedmem" ]
+        cpp.dynamicLibraries: ["pthread", "asound", "check", "rt"]
         cpp.includePaths: [ "src/" ]
         files: [ "src/tests/tst.cpp" ]
         Group {
