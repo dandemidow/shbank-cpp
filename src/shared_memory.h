@@ -30,10 +30,10 @@ public:
         return mem;
     }
     ~shared_memory(){
-        if(state == opened)
-            close_shared_banks(mem);
-        if(state == joined)
-            unjoin_shared_banks(mem);
+       // if(state == opened)
+         //   close_shared_banks(mem);
+        //if(state == joined)
+           // unjoin_shared_banks(mem);
 
     }
 };

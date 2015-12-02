@@ -23,7 +23,7 @@ struct consumer{
             return join_capture_msg_bank(mem.raw());
     }
     static void free_mem(shared_memory &mem,msg_bank_t *bank){
-        unjoin_msg_bank(bank);
+        unjoin_shared_banks(mem.raw());
     }
     static void connect(){
 
@@ -42,6 +42,7 @@ struct producer{
     }
     static void free_mem(shared_memory &mem,msg_bank_t *bank){
         wait_banks_unjoin(mem.raw());
+        close_shared_banks(mem.raw());
     }
     static void connect(shared_memory &mem){
         wait_banks_join(mem.raw());

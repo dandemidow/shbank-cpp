@@ -2,6 +2,8 @@
 #define BOOST_TEST_MODULE shmobank
 
 #include <boost/test/unit_test.hpp>
+#include <boost/filesystem.hpp>
+
 #include <unistd.h>
 #include <signal.h>
 #include <sys/wait.h>
@@ -45,6 +47,8 @@ BOOST_AUTO_TEST_CASE(TestPushPopMessage)
     BOOST_REQUIRE_EQUAL(msg->txt[0],'0');
     BOOST_REQUIRE_EQUAL(msg->txt[1],'1');
     BOOST_REQUIRE_EQUAL(msg->txt[2],'2');
+    int status;
+    waitpid(pid, &status, 0);
 
 }
 BOOST_AUTO_TEST_SUITE_END()
