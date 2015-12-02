@@ -3,9 +3,8 @@
 #include <string>
 #include <cstring>
 
-extern "C" {
+#include <shmobank/bank.h>
 #include <shmobank/monmsg.h>
-}
 
 class shared_memory{
     shared_mem_t *mem;
@@ -31,7 +30,11 @@ public:
         return mem;
     }
     ~shared_memory(){
-        close_shared_banks(mem);
+        if(state == opened)
+            close_shared_banks(mem);
+        if(state == joined)
+            unjoin_shared_banks(mem);
+
     }
 };
 #endif // SHARED_MEMORY

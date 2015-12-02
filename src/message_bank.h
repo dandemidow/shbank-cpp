@@ -22,9 +22,8 @@ public:
     typedef User user_type;
 
     template<class TagType>
-    message_bank(shared_memory &mem,TagType tag,std::size_t size = 2)
-      : mem(mem),
-        bank(user_type::init_bank(mem,tag,size)){
+    message_bank(shared_memory &mem,TagType tag,std::size_t size = 2) : mem(mem){
+        bank = user_type::init_bank(mem,tag,size);
     }
     void wait_connect(){
         user_type::connect(mem);
@@ -46,7 +45,8 @@ public:
     }
     void push_message(const message_type &message){
         msgblk_t *msg = prep_msg(mem.raw());
-        msg = message_type::transform(message);
+        msgblk_t* _msg = message_type::transform(message);
+        std::memcpy(msg,_msg,sizeof(*_msg));
         push_msg(mem.raw(),bank, msg);
     }
     void wait_activate(){
