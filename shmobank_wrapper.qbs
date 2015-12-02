@@ -35,7 +35,7 @@ Project {
         name: "tst_shmobank++"
         type: ["application"]
         cpp.staticLibraries: [ "shmobank", "sharedmem" ]
-        cpp.dynamicLibraries: ["pthread", "asound", "check", "rt"]
+        cpp.dynamicLibraries: ["pthread", "boost_unit_test_framework","boost_system", "rt"]
         cpp.includePaths: [ "src/" ]
         files: [ "src/tests/tst.cpp" ]
         Group {

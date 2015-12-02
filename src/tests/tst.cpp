@@ -1,5 +1,10 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE shmobank
+#include <iostream>
+#include "msgpolicy.h"
+#include "producer.h"
+#include "consumer.h"
+#include "bank.h"
 
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
@@ -8,12 +13,25 @@
 #include <signal.h>
 #include <sys/wait.h>
 
-#include "message_bank.h"
-#include "message.h"
-
-
 BOOST_AUTO_TEST_SUITE(SharedMemorySuite)
 
+BOOST_AUTO_TEST_CASE(TestProcedurePushPopMessage) {
+  shared_memory<Producer> mem("acars_bank");
+  auto playbank = mem.create<bank<msgblk_t>>(special_bank_tags::playback, 2);
+  auto msg = playbank.prep();
+  playbank.activate();
+  msg->txt[0] = 'X';
+  msg->txt[1] = '\0';
+  playbank.push(msg);
+  auto msg_1 = playbank.pop();
+  if (msg_1) {
+  playbank.free(msg_1);
+  std::cout<<"msg "<<msg_1->txt<<std::endl;
+  } else {
+    std::cerr<<"error: msg is null"<<std::endl;
+  }
+}
+/*
 BOOST_AUTO_TEST_CASE(TestPushPopMessage)
 {
     pid_t pid = fork();
@@ -51,4 +69,5 @@ BOOST_AUTO_TEST_CASE(TestPushPopMessage)
     waitpid(pid, &status, 0);
 
 }
+*/
 BOOST_AUTO_TEST_SUITE_END()
