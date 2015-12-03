@@ -14,13 +14,14 @@ Project {
             name: "headers"
             qbs.install: true
             qbs.installDir: "/usr/include/shmobank++"
+            prefix: "src/"
             files: [
-                "src/bank.hpp",
-                "src/memory.hpp",
-                "src/user_types.hpp",
-                "src/msgpolicy.hpp",
-                "src/producer.hpp",
-                "src/consumer.hpp"
+                "bank.hpp",
+                "memory.hpp",
+                "user_types.hpp",
+                "msgpolicy.hpp",
+                "producer.hpp",
+                "consumer.hpp"
             ]
         }
         Group {

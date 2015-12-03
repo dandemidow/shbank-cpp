@@ -19,15 +19,16 @@ BOOST_AUTO_TEST_CASE(TestProcedurePushPopMessage) {
   shmobank::producer mem("acars_bank");
   auto playbank = mem.create<shmobank::bank>(shmobank::tags::playback, 2);
   auto msg = playbank.prep();
+  BOOST_REQUIRE(msg);
   playbank.activate();
   msg->txt[0] = 'X';
   msg->txt[1] = '\0';
-  playbank.push(msg);
+  bool ok = playbank.push(msg);
+  BOOST_REQUIRE(ok);
   auto msg_1 = playbank.pop();
   BOOST_CHECK(msg_1);
   if (msg_1) {
     playbank.free(msg_1);
-    std::cout<<"msg "<<msg_1->txt<<std::endl;
     BOOST_REQUIRE_EQUAL(std::string(reinterpret_cast<char*>(msg_1->txt)), "X");
   } else {
     BOOST_FAIL("msg_1 should be not null");
