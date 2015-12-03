@@ -27,7 +27,7 @@ public:
   { at_exit = std::move(obj.at_exit); /*obj.at_exit = nullptr;*/  }
   ~bank() { if (at_exit) at_exit(mem, _bank); }
   template <class User>
-  static bank create(shared_mem_t *mem, special_bank_tags tag, int count = 0, typename std::enable_if<std::is_same<User, Producer>::value>::type * = nullptr) {
+  static bank create(shared_mem_t *mem, special_bank_tags tag, int count = 2, typename std::enable_if<std::is_same<User, Producer>::value>::type * = nullptr) {
     int _tag = tag == special_bank_tags::playback?Playback:Capture;
     msg_bank_t *_b = init_msg_bank(mem, count, _tag);
     bank &&tmp = std::move(bank(mem, _b));
@@ -37,6 +37,7 @@ public:
 
   template <class User>
   static bank create(shared_mem_t *mem, special_bank_tags tag, int count = 0, typename std::enable_if<std::is_same<User, Consumer>::value>::type * = nullptr) {
+    (void)(count);
     int _tag = tag == special_bank_tags::playback?Playback:Capture;
     msg_bank_t *_b = join_msg_bank(mem, _tag);
     bank &&tmp = std::move(bank(mem, _b));
