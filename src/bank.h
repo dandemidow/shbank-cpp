@@ -35,6 +35,15 @@ public:
     return std::move(tmp);
   }
 
+  template <class User>
+  static bank create(shared_mem_t *mem, special_bank_tags tag, int count = 0, typename std::enable_if<std::is_same<User, Consumer>::value>::type * = nullptr) {
+    int _tag = tag == special_bank_tags::playback?Playback:Capture;
+    msg_bank_t *_b = join_msg_bank(mem, _tag);
+    bank &&tmp = std::move(bank(mem, _b));
+    tmp.at_exit = [](shared_mem_t *, msg_bank_t *b) { unjoin_msg_bank(b); };
+    return std::move(tmp);
+  }
+
   void activate() {
     active_msg_bank(_bank);
   }
