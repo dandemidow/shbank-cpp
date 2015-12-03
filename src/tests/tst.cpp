@@ -3,10 +3,8 @@
 #include <iostream>
 #include <thread>
 
-#include "msgpolicy.h"
-#include "producer.h"
-#include "consumer.h"
-#include "bank.h"
+#include "default/producer.hpp"
+#include "default/consumer.hpp"
 
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
@@ -18,8 +16,8 @@
 BOOST_AUTO_TEST_SUITE(SharedMemorySuite)
 
 BOOST_AUTO_TEST_CASE(TestProcedurePushPopMessage) {
-  shared_memory<Producer> mem("acars_bank");
-  auto playbank = mem.create<bank<msgblk_t>>(special_bank_tags::playback, 2);
+  shmobank::producer mem("acars_bank");
+  auto playbank = mem.create<shmobank::bank>(shmobank::tags::playback, 2);
   auto msg = playbank.prep();
   playbank.activate();
   msg->txt[0] = 'X';
@@ -40,13 +38,13 @@ BOOST_AUTO_TEST_CASE(TestPushPopMessage)
   { // open and close this shared memory for cleaning only
     shared_memory<Producer> mem("acars_bank");
   }
-  shared_memory<Producer> mem("acars_bank");
-  auto playbank = mem.create<bank<msgblk_t>>(special_bank_tags::playback, 2);
+  shmobank::producer mem("acars_bank");
+  auto playbank = mem.create<shmobank::bank>(shmobank::tags::playback, 2);
 
   // and now we start the cunsumer!
   std::thread thr([](){
-    shared_memory<Consumer> mem("acars_bank");
-    auto playbank = mem.create<bank<msgblk_t>>(special_bank_tags::playback);
+    shmobank::consumer mem("acars_bank");
+    auto playbank = mem.create<shmobank::bank>(shmobank::tags::playback);
     msgblk_t *msg = playbank.prep();
     msg->lvl = 10;
     msg->next = 0;

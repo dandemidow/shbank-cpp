@@ -1,7 +1,7 @@
 #ifndef _CONSUMER_H_
 #define _CONSUMER_H_
 
-#include "user_types.h"
+#include "user_types.hpp"
 
 extern "C" {
 #include <shmobank/monmsg.h>

@@ -3,7 +3,7 @@
 
 #include <functional>
 
-#include "memory.h"
+#include "memory.hpp"
 
 class init_bank_exception : public std::exception{
 public:

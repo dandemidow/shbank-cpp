@@ -15,13 +15,23 @@ Project {
             qbs.install: true
             qbs.installDir: "/usr/include/shmobank++"
             files: [
-                "src/bank.h",
-                "src/memory.h",
-                "src/user_types.h",
-                "src/msgpolicy.h",
-                "src/message.h",
-                "src/producer.h",
-                "src/consumer.h"
+                "src/bank.hpp",
+                "src/memory.hpp",
+                "src/user_types.hpp",
+                "src/msgpolicy.hpp",
+                "src/producer.hpp",
+                "src/consumer.hpp"
+            ]
+        }
+        Group {
+            name: "def_headers"
+            qbs.install: true
+            qbs.installDir: "/usr/include/shmobank++/default"
+            prefix: "src/default/"
+            files: [
+                "producer.hpp",
+                "consumer.hpp",
+                "bank.hpp"
             ]
         }
         Group {
@@ -41,7 +51,7 @@ Project {
         Group {
             name: "shmobank"
             prefix: "src/"
-            files: [ "*.h", "*.cpp" ]
+            files: [ "*.hpp" ]
         }
     }
 }
