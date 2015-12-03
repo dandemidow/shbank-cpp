@@ -7,9 +7,6 @@ Project {
         cpp.cxxFlags: "-std=c++11"
         name: "shmobank++"
         cpp.staticLibraries: ["sharedmem","shmobank"]
-        files: [
-
-        ]
         Group {
             name: "headers"
             qbs.install: true
@@ -20,6 +17,7 @@ Project {
                 "memory.hpp",
                 "user_types.hpp",
                 "msgpolicy.hpp",
+                "msgerrors.hpp",
                 "producer.hpp",
                 "consumer.hpp"
             ]
