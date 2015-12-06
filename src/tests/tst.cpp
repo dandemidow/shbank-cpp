@@ -18,12 +18,13 @@ BOOST_AUTO_TEST_SUITE(SharedMemorySuite)
 BOOST_AUTO_TEST_CASE(TestProcedurePushPopMessage) {
   shmobank::producer mem("acars_bank");
   auto playbank = mem.create<shmobank::bank>(shmobank::tags::playback, 2);
-  auto msg = playbank.prep();
-  BOOST_REQUIRE(msg);
+  msg::error err;
+  auto ms = playbank.prep(err);
+  BOOST_REQUIRE(ms);
   playbank.activate();
-  msg->txt[0] = 'X';
-  msg->txt[1] = '\0';
-  bool ok = playbank.push(msg);
+  ms->txt[0] = 'X';
+  ms->txt[1] = '\0';
+  bool ok = playbank.push(ms);
   BOOST_REQUIRE(ok);
   auto msg_1 = playbank.pop();
   BOOST_CHECK(msg_1);

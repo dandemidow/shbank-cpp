@@ -6,14 +6,64 @@
 namespace msg {
 
 struct MsgPolicy {
-  bool push(const msgblk_t &msg) {
-    return push_msg_copy(mem, bank, const_cast<msgblk_t*>(&msg), 0)>=0;
+  bool push(const msgblk_t &msg,error &err) {
+      int result = push_msg_copy(mem, bank, const_cast<msgblk_t*>(&msg), 0);
+      err.set(result);
+      return result >= 0;
   }
-  bool push(msgblk_t *msg) {
-    return push_msg(mem, bank, msg, 0)>=0;
+  bool push_test(const msgblk_t &msg,error &err) {
+      int result = push_msg_copy(mem, bank, const_cast<msgblk_t*>(&msg), 1);
+      err.set(result);
+      return result >= 0;
   }
+  bool push(const msgblk_t &msg)
+  {
+      error err;
+      int result = push(msg,err);
+      if(err)
+         throw exception(err);
+      return result >= 0;
+  }
+  bool push_test(const msgblk_t &msg)
+  {
+      error err;
+      int result = push_test(msg,err);
+      if(err)
+         throw exception(err);
+      return result >= 0;
+  }
+  bool push(msgblk_t *msg,error &err) {
+      int result = push_msg(mem, bank, msg, 0);
+      err.set(result);
+      return result >= 0;
+  }
+  bool push_test(msgblk_t *msg,error &err) {
+      int result = push_msg(mem, bank, msg, 1);
+      err.set(result);
+      return result >= 0;
+  }
+  bool push(msgblk_t *msg)
+  {
+      error err;
+      int result = push(msg,err);
+      if(err)
+         throw exception(err);
+      return result >= 0;
+  }
+  bool push_test(msgblk_t *msg)
+  {
+      error err;
+      int result = push_test(msg,err);
+      if(err)
+         throw exception(err);
+      return result >= 0;
+  }
+
   msgblk_t *pop() {
     return pop_msg(mem, bank, 0, NULL);
+  }
+  msgblk_t *pop_test() {
+    return pop_msg(mem, bank, 1, NULL);
   }
   msgblk_t *prep() {
     error err;
