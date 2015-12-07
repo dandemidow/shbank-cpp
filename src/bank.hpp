@@ -30,6 +30,8 @@ public:
   static bank create(shared_mem_t *mem, special_bank_tags tag, int count = 2, typename std::enable_if<std::is_same<User, Producer>::value>::type * = nullptr) {
     int _tag = tag == special_bank_tags::playback?Playback:Capture;
     msg_bank_t *_b = init_msg_bank(mem, count, _tag);
+    if(!_b)
+        throw(init_bank_exception());
     bank &&tmp = std::move(bank(mem, _b));
     tmp.at_exit = [](shared_mem_t *mem, msg_bank_t *b) { free_msg_bank(mem, b); };
     return std::move(tmp);
@@ -40,6 +42,8 @@ public:
     (void)(count);
     int _tag = tag == special_bank_tags::playback?Playback:Capture;
     msg_bank_t *_b = join_msg_bank(mem, _tag);
+    if(!_b)
+        throw(init_bank_exception());
     bank &&tmp = std::move(bank(mem, _b));
     tmp.at_exit = [](shared_mem_t *, msg_bank_t *b) { unjoin_msg_bank(b); };
     return std::move(tmp);
