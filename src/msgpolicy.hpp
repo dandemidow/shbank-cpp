@@ -34,11 +34,7 @@ namespace msg {
     }
 
     bool push_test(const msgblk_t &msg) {
-      error err;
-      int result = push_test(msg,err);
-      if(err)
-        throw exception(err);
-      return result >= 0;
+        return _msg_arg_exception<decltype(msg)>(&MsgPolicy::push_test, msg);
     }
 
     bool push_test(msgblk_t *msg, error &err) {
@@ -48,11 +44,7 @@ namespace msg {
     }
 
     bool push_test(msgblk_t *msg) {
-      error err;
-      int result = push_test(msg,err);
-      if(err)
-        throw exception(err);
-      return result >= 0;
+      return _msg_arg_exception<decltype(msg)>(&MsgPolicy::push_test, msg);
     }
 
     // pop
@@ -62,13 +54,19 @@ namespace msg {
       err.set(status);
       return msg;
     }
+    msgblk_t *pop_test(error &err) noexcept {
+      int status;
+      auto msg = pop_msg(mem, bank, 1, &status);
+      err.set(status);
+      return msg;
+    }
 
     msgblk_t *pop() throw(exception) {
       return _msg_void_exception(&MsgPolicy::pop);
     }
 
     msgblk_t *pop_test() {
-      return pop_msg(mem, bank, 1, NULL);
+      return _msg_void_exception(&MsgPolicy::pop_test);
     }
 
     //prep
