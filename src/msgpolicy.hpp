@@ -16,23 +16,21 @@ struct MsgPolicy {
       err.set(result);
       return result >= 0;
   }
-  bool push(const msgblk_t &msg)
-  {
+  bool push(const msgblk_t &msg) {
       error err;
       int result = push(msg,err);
       if(err)
          throw exception(err);
       return result >= 0;
   }
-  bool push_test(const msgblk_t &msg)
-  {
+  bool push_test(const msgblk_t &msg) {
       error err;
       int result = push_test(msg,err);
       if(err)
          throw exception(err);
       return result >= 0;
   }
-  bool push(msgblk_t *msg,error &err) {
+  bool push(msgblk_t *msg,error &err) noexcept {
       int result = push_msg(mem, bank, msg, 0);
       err.set(result);
       return result >= 0;
@@ -42,16 +40,14 @@ struct MsgPolicy {
       err.set(result);
       return result >= 0;
   }
-  bool push(msgblk_t *msg)
-  {
+  bool push(msgblk_t *msg) throw(exception) {
       error err;
       int result = push(msg,err);
       if(err)
          throw exception(err);
       return result >= 0;
   }
-  bool push_test(msgblk_t *msg)
-  {
+  bool push_test(msgblk_t *msg) {
       error err;
       int result = push_test(msg,err);
       if(err)

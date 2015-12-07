@@ -7,57 +7,56 @@
 extern "C" {
 #include <shmobank/monmsg.h>
 }
-#include <boost/system/error_code.hpp>
+
 namespace msg {
   class error {
     int val = MSG_SUCESS;
     friend class exception;
   public:
-    enum error_type{
-        success = 0,
-        not_active_bank = -1,
-        null_ptr = -2,
-        not_shared_ptr = -3,
-        no_shared_mem = 4,
-        no_queue = -5
+    enum error_type {
+      success = MSG_SUCESS,
+      not_active_bank = MSG_NOT_ACTIVE_BANK,
+      null_ptr = MSG_NULL_PTR,
+      not_shared_ptr = MSG_NOT_SHARED_PTR,
+      no_shared_mem = MSG_NO_SHARED_MEM,
+      no_queue = MSG_NO_QUEUE
     };
     error() = default;
     void set(int val) noexcept { this->val = val; }
     operator bool () {
-      return val != MSG_SUCESS;
+      return val != error_type::success;
     }
-    operator error_type(){
-        return value();
+    operator error_type() {
+      return value();
     }
-    error_type value()const{
-        return static_cast<error_type>(val);
+    error_type value() const {
+      return static_cast<error_type>(val);
     }
   };
 
   class exception : public std::exception{
-    int value = MSG_SUCESS;
+    int value = error::success;
 
   public:
-    exception(const error &err) : value(err.val)
-    {
-
-    }
+    exception(const error &err) : value(err.val) {}
     virtual const char* what() const noexcept{
       error::error_type val = static_cast<error::error_type>(value);
-      switch(val)
-      {
+      switch(val) {
         case error::not_active_bank:
-          return "not active bank error";
+        return "not active bank error";
         case error::null_ptr:
-          return "null pointer error";
+        return "null pointer error";
         case error::not_shared_ptr:
-          return "not shared pointer error";
+        return "not shared pointer error";
         case error::no_shared_mem:
-          return "no shared memory error";
+        return "no shared memory error";
         case error::no_queue:
-          return "no queue error";
+        return "no queue error";
+        case error::success:
+        return "success";
+        default:
+        return "unknown error";
       }
-      return "unknown error";
     }
   };
 }
