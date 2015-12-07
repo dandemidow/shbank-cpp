@@ -4,6 +4,7 @@
 #include "../bank.hpp"
 
 namespace shmobank {
+  using rawbank = bank<msgblk_t*>;
   using bank = bank<msgblk_t>;
   using tags = special_bank_tags;
 }
