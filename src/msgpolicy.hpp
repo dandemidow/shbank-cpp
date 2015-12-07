@@ -15,23 +15,29 @@ namespace msg {
     struct resolver <T, Ret(T::*)(error&)> {
       typedef Ret(T::*F)(error&);
 
-      static Ret exc(T *obj, F f) {
+      static Ret exc(T *obj, F f) throw(exception){
         error err;
-        return (obj->*f)(err);
+        auto result = (obj->*f)(err);
+        if(err)
+            throw(exception(err));
+        return result;
       }
     };
 
     template <class T, class Ret, class ...A>
     struct resolver <T, Ret(T::*)(error&, A...)> {
       typedef Ret(T::*F)(error&, A...);
-      static Ret exc(T *obj, F f, A... arg) {
+      static Ret exc(T *obj, F f, A... arg) throw(exception){
         error err;
-        return (obj->*f)(err, arg...);
+        auto result = (obj->*f)(err, arg...);
+        if(err)
+            throw(exception(err));
+        return result;
       }
     };
 
     template<class M, class T, class ...A>
-    static auto exc(T *obj, M m, A ...a) -> decltype(resolver<T, M>::exc(obj, m, a...)) {
+    static auto exc(T *obj, M m, A ...a) throw(exception) -> decltype(resolver<T, M>::exc(obj, m, a...))  {
       return resolver<T, M>::exc(obj, m, a...);
     }
   };
