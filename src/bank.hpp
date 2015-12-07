@@ -54,6 +54,9 @@ public:
   void wait_activating() {
     wait_bank_activate(_bank);
   }
+  bool wait_timeout_activating(int seconds){
+      return wait_timeout_bank_activate(_bank,seconds) == 0;
+  }
 };
 
 #endif // MESSAGE_BANK
