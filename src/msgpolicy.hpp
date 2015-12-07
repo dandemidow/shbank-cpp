@@ -27,7 +27,7 @@ namespace msg {
       return _msg_arg_exception<decltype(msg)>(&MsgPolicy::push, msg);
     }
 
-    bool push_test(const msgblk_t &msg, error &err) {
+    bool push_test(const msgblk_t &msg, error &err) noexcept{
       int result = push_msg_copy(mem, bank, const_cast<msgblk_t*>(&msg), 1);
       err.set(result);
       return result >= 0;
@@ -37,7 +37,7 @@ namespace msg {
         return _msg_arg_exception<decltype(msg)>(&MsgPolicy::push_test, msg);
     }
 
-    bool push_test(msgblk_t *msg, error &err) {
+    bool push_test(msgblk_t *msg, error &err) noexcept{
       int result = push_msg(mem, bank, msg, 1);
       err.set(result);
       return result >= 0;
