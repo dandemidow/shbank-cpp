@@ -60,7 +60,6 @@ namespace msg {
       err.set(result);
       return result >= 0;
     }
-
     bool push(const msgblk_t &msg) throw(exception) {
       return _add_exception::exc<PushType>(this, &MsgPolicy::push, msg);
     }
@@ -79,16 +78,20 @@ namespace msg {
     msgblk_t pop(error &err) noexcept {
       int status;
       auto msg = pop_msg(mem, bank, 0, &status);
-      auto obj = *msg;
       err.set(status);
+      if(msg == nullptr)
+          return msgblk_t();
+      auto obj = *msg;
       free_msg(mem, msg);
       return obj;
     }
     msgblk_t pop_test(error &err) noexcept {
       int status;
       auto msg = pop_msg(mem, bank, 1, &status);
-      auto obj = *msg;
       err.set(status);
+      if(msg == nullptr)
+          return msgblk_t();
+      auto obj = *msg;
       free_msg(mem, msg);
       return obj;
     }
