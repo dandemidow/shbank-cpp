@@ -19,7 +19,8 @@ namespace msg {
       null_ptr = MSG_NULL_PTR,
       not_shared_ptr = MSG_NOT_SHARED_PTR,
       no_shared_mem = MSG_NO_SHARED_MEM,
-      no_queue = MSG_NO_QUEUE
+      no_queue = MSG_NO_QUEUE,
+      bank_not_init = -6
     };
     error() = default;
     void set(int val) noexcept { this->val = val; }
@@ -52,6 +53,8 @@ namespace msg {
         return "no shared memory error";
         case error::no_queue:
         return "no queue error";
+        case error::bank_not_init:
+        return "bank not init error";
         case error::success:
         return "success";
         default:

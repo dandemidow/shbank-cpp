@@ -48,6 +48,12 @@ namespace msg {
   protected:
     shared_mem_t *mem;
     msg_bank_t *bank;
+    bool check(error &err)
+    {
+        bool res = mem != nullptr && bank != nullptr;
+        err.set(res ? error::success : error::bank_not_init);
+        return res;
+    }
   };
 
   struct MsgPolicy : public MsgBasic {
@@ -56,6 +62,8 @@ namespace msg {
 
     // push
     bool push(error &err, const msgblk_t &msg) noexcept {
+      auto res = check(err);
+      if(!res)return false;
       int result = push_msg_copy(mem, bank, const_cast<msgblk_t*>(&msg), 0);
       err.set(result);
       return result >= 0;
@@ -65,6 +73,8 @@ namespace msg {
     }
 
     bool push_test(error &err, const msgblk_t &msg) noexcept{
+      auto res = check(err);
+      if(!res)return false;
       int result = push_msg_copy(mem, bank, const_cast<msgblk_t*>(&msg), 1);
       err.set(result);
       return result >= 0;
@@ -76,6 +86,8 @@ namespace msg {
 
     // pop
     msgblk_t pop(error &err) noexcept {
+      auto res = check(err);
+      if(!res)return msgblk_t();
       int status;
       auto msg = pop_msg(mem, bank, 0, &status);
       err.set(status);
@@ -86,6 +98,8 @@ namespace msg {
       return obj;
     }
     msgblk_t pop_test(error &err) noexcept {
+      auto res = check(err);
+      if(!res)return msgblk_t();
       int status;
       auto msg = pop_msg(mem, bank, 1, &status);
       err.set(status);
@@ -113,6 +127,8 @@ namespace msg {
 
     // push
     bool push(error &err, msgblk_t *msg) noexcept {
+      auto res = check(err);
+      if(!res)return false;
       int result = push_msg(mem, bank, msg, 0);
       err.set(result);
       return result >= 0;
@@ -122,6 +138,8 @@ namespace msg {
     }
 
     bool push_test(error &err, msgblk_t *msg) noexcept{
+      auto res = check(err);
+      if(!res)return false;
       int result = push_msg(mem, bank, msg, 1);
       err.set(result);
       return result >= 0;
@@ -133,6 +151,8 @@ namespace msg {
 
     // prep
     msgblk_t *prep(error &err) noexcept {
+      auto res = check(err);
+      if(!res)return nullptr;
       int status;
       auto msg = prep_msg(mem, &status);
       err.set(status);
@@ -145,12 +165,16 @@ namespace msg {
 
     // pop
     msgblk_t *pop(error &err) noexcept {
+      auto res = check(err);
+      if(!res)return nullptr;
       int status;
       auto msg = pop_msg(mem, bank, 0, &status);
       err.set(status);
       return msg;
     }
     msgblk_t *pop_test(error &err) noexcept {
+      auto res = check(err);
+      if(!res)return nullptr;
       int status;
       auto msg = pop_msg(mem, bank, 1, &status);
       err.set(status);
