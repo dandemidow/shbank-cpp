@@ -8,7 +8,10 @@ extern "C" {
 }
 namespace shm {
 struct consumer {
-  shared_mem_t *init(const std::string &name) { return join_to_shared_banks(const_cast<char*>(name.c_str())); }
+  shared_mem_t *init(const std::string &name) {
+    // FIXME put status instead NULL
+    return join_to_shared_banks(const_cast<char*>(name.c_str()), NULL);
+  }
   void exit(shared_mem_t *mem) { unjoin_shared_banks(mem); }
 };
 
