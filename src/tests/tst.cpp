@@ -15,7 +15,18 @@
 
 BOOST_AUTO_TEST_SUITE(SharedMemorySuite)
 
-
+BOOST_AUTO_TEST_CASE(TestConsumerJoinException) {
+  bool exc = false;
+  try {
+    shmobank::consumer mem("acars_bank");
+    BOOST_FAIL("Comsumer was created without Producer");
+    auto playbank = mem.create<shmobank::bank>(shmobank::tags::playback);
+  }
+  catch(bad_memory_exception e) {
+    exc = true;
+  }
+  BOOST_REQUIRE(exc);
+}
 BOOST_AUTO_TEST_CASE(TestRawProcedurePushPopMessage) {
   shmobank::producer mem("acars_bank");
   auto playbank = mem.create<shmobank::rawbank>(shmobank::tags::playback, 2);

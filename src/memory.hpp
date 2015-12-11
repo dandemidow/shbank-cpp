@@ -7,7 +7,7 @@ extern "C" {
 }
 class bad_memory_exception : public std::exception{
 public:
-  virtual const char* what() const _GLIBCXX_USE_NOEXCEPT{
+  virtual const char* what() const noexcept{
     return "create shared memory";
   }
 };
@@ -35,6 +35,9 @@ public:
   }
   void wait_unjoin() {
     wait_banks_unjoin(mem);
+  }
+  gid_t pid() const {
+    return get_master_pid(mem);
   }
 };
 #endif  // _MEMORY_H_
