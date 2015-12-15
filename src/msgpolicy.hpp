@@ -62,22 +62,14 @@ namespace msg {
 
     // push
     bool push(error &err, const msgblk_t &msg) noexcept {
-      auto res = check(err);
-      if(!res)return false;
-      int result = push_msg_copy(mem, bank, const_cast<msgblk_t*>(&msg), 0);
-      err.set(result);
-      return result >= 0;
+      return push(err,msg,0);
     }
     bool push(const msgblk_t &msg) throw(exception) {
       return _add_exception::exc<PushType>(this, &MsgPolicy::push, msg);
     }
 
     bool push_test(error &err, const msgblk_t &msg) noexcept{
-      auto res = check(err);
-      if(!res)return false;
-      int result = push_msg_copy(mem, bank, const_cast<msgblk_t*>(&msg), 1);
-      err.set(result);
-      return result >= 0;
+        return push(err,msg,1);
     }
 
     bool push_test(const msgblk_t &msg) {
@@ -86,28 +78,10 @@ namespace msg {
 
     // pop
     msgblk_t pop(error &err) noexcept {
-      auto res = check(err);
-      if(!res)return msgblk_t();
-      int status;
-      auto msg = pop_msg(mem, bank, 0, &status);
-      err.set(status);
-      if(msg == nullptr)
-          return msgblk_t();
-      auto obj = *msg;
-      free_msg(mem, msg);
-      return obj;
+      return pop(err,0);
     }
     msgblk_t pop_test(error &err) noexcept {
-      auto res = check(err);
-      if(!res)return msgblk_t();
-      int status;
-      auto msg = pop_msg(mem, bank, 1, &status);
-      err.set(status);
-      if(msg == nullptr)
-          return msgblk_t();
-      auto obj = *msg;
-      free_msg(mem, msg);
-      return obj;
+      return pop(err,1);
     }
 
     msgblk_t pop() throw(exception) {
@@ -119,6 +93,29 @@ namespace msg {
     }
 
     MsgPolicy(shared_mem_t *mem, msg_bank_t *bank) : MsgBasic(mem, bank) {}
+
+  private:
+    msgblk_t pop(error& err,int num)
+    {
+        auto res = check(err);
+        if(!res)return msgblk_t();
+        int status;
+        auto msg = pop_msg(mem, bank, num, &status);
+        err.set(status);
+        if(msg == nullptr)
+            return msgblk_t();
+        auto obj = *msg;
+        free_msg(mem, msg);
+        return obj;
+    }
+    bool push(error &err,const msgblk_t &msg,int num)
+    {
+        auto res = check(err);
+        if(!res)return false;
+        int result = push_msg_copy(mem, bank, const_cast<msgblk_t*>(&msg), num);
+        err.set(result);
+        return result >= 0;
+    }
   };
 
   struct MsgPolicyRaw : public MsgBasic {
@@ -127,22 +124,14 @@ namespace msg {
 
     // push
     bool push(error &err, msgblk_t *msg) noexcept {
-      auto res = check(err);
-      if(!res)return false;
-      int result = push_msg(mem, bank, msg, 0);
-      err.set(result);
-      return result >= 0;
+        return push(err,msg,0);
     }
     bool push(msgblk_t *msg) throw(exception) {
       return _add_exception::exc<PushType>(this, &MsgPolicyRaw::push, msg);
     }
 
     bool push_test(error &err, msgblk_t *msg) noexcept{
-      auto res = check(err);
-      if(!res)return false;
-      int result = push_msg(mem, bank, msg, 1);
-      err.set(result);
-      return result >= 0;
+      return push(err,msg,1);
     }
 
     bool push_test(msgblk_t *msg) {
@@ -165,20 +154,10 @@ namespace msg {
 
     // pop
     msgblk_t *pop(error &err) noexcept {
-      auto res = check(err);
-      if(!res)return nullptr;
-      int status;
-      auto msg = pop_msg(mem, bank, 0, &status);
-      err.set(status);
-      return msg;
+        return pop(err,0);
     }
     msgblk_t *pop_test(error &err) noexcept {
-      auto res = check(err);
-      if(!res)return nullptr;
-      int status;
-      auto msg = pop_msg(mem, bank, 1, &status);
-      err.set(status);
-      return msg;
+        return pop(err,1);
     }
 
     typedef msgblk_t*(MsgPolicy::*PopPtrType)(error&);
@@ -196,6 +175,23 @@ namespace msg {
     }
 
     MsgPolicyRaw(shared_mem_t *mem, msg_bank_t *bank) : MsgBasic(mem, bank) {}
+  private:
+    msgblk_t *pop(error &err,int num)
+    {
+        auto res = check(err);
+        if(!res)return nullptr;
+        int status;
+        auto msg = pop_msg(mem, bank, num, &status);
+        err.set(status);
+        return msg;
+    }
+    bool push(error &err, msgblk_t *msg,int num) noexcept{
+      auto res = check(err);
+      if(!res)return false;
+      int result = push_msg(mem, bank, msg, num);
+      err.set(result);
+      return result >= 0;
+    }
 
   };
 
