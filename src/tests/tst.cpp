@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <sys/wait.h>
+#include <memory>
 
 BOOST_AUTO_TEST_SUITE(SharedMemorySuite)
 
@@ -27,6 +28,19 @@ BOOST_AUTO_TEST_CASE(TestConsumerJoinException) {
   }
   BOOST_REQUIRE(exc);
 }
+
+BOOST_AUTO_TEST_CASE(TestVisibleAreaException) {
+  auto f = []()
+  {
+    shmobank::producer mem("acars_bank");
+    auto b1 = mem.create<shmobank::bank>(shmobank::tags::playback);
+    BOOST_REQUIRE(!b1.is_active());
+    return  b1;
+  };
+  auto b = f();
+  BOOST_REQUIRE_THROW(!b.is_active(), std::exception);
+}
+
 BOOST_AUTO_TEST_CASE(TestRawProcedurePushPopMessage) {
   shmobank::producer mem("acars_bank");
   auto playbank = mem.create<shmobank::rawbank>(shmobank::tags::playback, 2);

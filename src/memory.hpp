@@ -14,16 +14,15 @@ public:
 
 template <class User>
 class shared_memory : shm::trait<User>::type {
-  shared_mem_t *mem = nullptr;
+  const shared_mem_t *const mem;
   typedef typename shm::trait<User>::type policy;
 public:
   shared_memory(const std::string &name):
-    mem(policy::init(name))
-  {
+    mem(policy::init(name)) {
       if(mem == nullptr)
           throw(bad_memory_exception());
   }
-  ~shared_memory() { policy::exit(mem); }
+  ~shared_memory() { policy::exit(const_cast<shared_mem_t*>(mem)); }
   shared_memory(const shared_memory &) = delete;
   shared_memory(const shared_memory &&) = delete;
   template <class Obj, class ...A>

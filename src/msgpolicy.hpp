@@ -43,11 +43,11 @@ namespace msg {
   };
 
   struct MsgBasic {
-    MsgBasic(shared_mem_t *mem, msg_bank_t *bank) :
+    MsgBasic(const shared_mem_t *const mem, const msg_bank_t *const bank) :
       mem(mem), bank(bank) {}
   protected:
-    shared_mem_t *mem;
-    msg_bank_t *bank;
+    const shared_mem_t *const mem;
+    const msg_bank_t *const bank;
     bool check(error &err)
     {
         bool res = mem != nullptr && bank != nullptr;
@@ -92,7 +92,7 @@ namespace msg {
       return _add_exception::exc<PopType>(this, &MsgPolicy::pop_test);
     }
 
-    MsgPolicy(shared_mem_t *mem, msg_bank_t *bank) : MsgBasic(mem, bank) {}
+    MsgPolicy(const shared_mem_t *const mem, const msg_bank_t *const bank) : MsgBasic(mem, bank) {}
 
   private:
     msgblk_t pop(error& err,int num)
@@ -174,7 +174,7 @@ namespace msg {
       if ( msg ) free_msg(mem, msg);
     }
 
-    MsgPolicyRaw(shared_mem_t *mem, msg_bank_t *bank) : MsgBasic(mem, bank) {}
+    MsgPolicyRaw(const shared_mem_t *const mem, const msg_bank_t *const bank) : MsgBasic(mem, bank) {}
   private:
     msgblk_t *pop(error &err,int num)
     {
