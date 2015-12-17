@@ -59,7 +59,6 @@ public:
     wait_bank_activate(_bank);
   }
   bool is_active() const {
-    std::cout<<"bank: "<<_bank<<" mem: "<<mem<<std::endl;
     return is_active_bank(_bank);
   }
 
