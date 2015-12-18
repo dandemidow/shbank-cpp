@@ -38,15 +38,7 @@ BOOST_AUTO_TEST_CASE(TestVisibleAreaException) {
     return  b1;
   };
   auto b = f();
-  try{
-      b.is_active();
-  }
-  catch(memory_deleted_exception &ex)
-  {
-      std::cerr << ex.what();
-  }
-
- // BOOST_REQUIRE_THROW(!b.is_active(), std::exception);
+  BOOST_REQUIRE_THROW(!b.is_active(), std::exception);
 }
 
 BOOST_AUTO_TEST_CASE(TestRawProcedurePushPopMessage) {

@@ -45,10 +45,10 @@ namespace msg {
   };
 
   struct MsgBasic {
-    MsgBasic(std::shared_ptr<shared_mem_t> mem, const msg_bank_t *const bank) :
+    MsgBasic(std::shared_ptr<shared_mem_t*> mem, const msg_bank_t *const bank) :
       mem(mem), bank(bank) {}
   protected:
-    std::shared_ptr<shared_mem_t> mem;
+    std::shared_ptr<shared_mem_t*> mem;
     const msg_bank_t *const bank;
   };
 
@@ -88,27 +88,27 @@ namespace msg {
       return _add_exception::exc<PopType>(this, &MsgPolicy::pop_test);
     }
 
-    MsgPolicy(std::shared_ptr<shared_mem_t> mem, const msg_bank_t *const bank) : MsgBasic(mem, bank) {}
+    MsgPolicy(std::shared_ptr<shared_mem_t*> mem, const msg_bank_t *const bank) : MsgBasic(mem, bank) {}
 
   private:
     msgblk_t pop(error& err,int num) throw(memory_deleted_exception)
     {
-        if(!mem)
+        if(*(mem.get()) == nullptr)
             throw(memory_deleted_exception());
         int status;
-        auto msg = pop_msg(mem.get(), bank, num, &status);
+        auto msg = pop_msg(*mem.get(), bank, num, &status);
         err.set(status);
         if(msg == nullptr)
             return msgblk_t();
         auto obj = *msg;
-        free_msg(mem.get(), msg);
+        free_msg(*mem.get(), msg);
         return obj;
     }
     bool push(error &err,const msgblk_t &msg,int num)throw(memory_deleted_exception)
     {
-        if(!mem)
+        if(*(mem.get()) == nullptr)
             throw(memory_deleted_exception());
-        int result = push_msg_copy(mem.get(), bank, const_cast<msgblk_t*>(&msg), num);
+        int result = push_msg_copy(*mem.get(), bank, const_cast<msgblk_t*>(&msg), num);
         err.set(result);
         return result >= 0;
     }
@@ -136,10 +136,10 @@ namespace msg {
 
     // prep
     msgblk_t *prep(error &err) throw(memory_deleted_exception) {
-        if(!mem)
+        if(*(mem.get()) == nullptr)
             throw(memory_deleted_exception());
       int status;
-      auto msg = prep_msg(mem.get(), &status);
+      auto msg = prep_msg(*mem.get(), &status);
       err.set(status);
       return msg;
     }
@@ -167,26 +167,26 @@ namespace msg {
     }
 
     void free(msgblk_t *msg) throw(memory_deleted_exception) {
-        if(!mem)
+        if(*(mem.get()) == nullptr)
             throw(memory_deleted_exception());
-      if ( msg ) free_msg(mem.get(), msg);
+      if ( msg ) free_msg(*mem.get(), msg);
     }
 
-    MsgPolicyRaw(std::shared_ptr<shared_mem_t> mem, const msg_bank_t *const bank) : MsgBasic(mem, bank) {}
+    MsgPolicyRaw(std::shared_ptr<shared_mem_t*> mem, const msg_bank_t *const bank) : MsgBasic(mem, bank) {}
   private:
     msgblk_t *pop(error &err,int num)
     {
-        if(!mem)
+        if(*(mem.get()) == nullptr)
             throw(memory_deleted_exception());
         int status;
-        auto msg = pop_msg(mem.get(), bank, num, &status);
+        auto msg = pop_msg(*mem.get(), bank, num, &status);
         err.set(status);
         return msg;
     }
     bool push(error &err, msgblk_t *msg,int num) throw(memory_deleted_exception){
-        if(!mem)
+        if(*(mem.get()) == nullptr)
             throw(memory_deleted_exception());
-      int result = push_msg(mem.get(), bank, msg, num);
+      int result = push_msg(*mem.get(), bank, msg, num);
       err.set(result);
       return result >= 0;
     }
