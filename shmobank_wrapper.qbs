@@ -6,7 +6,7 @@ Project {
     CxxStaticLibrary {
         cpp.cxxFlags: "-std=c++11"
         name: "shmobank++"
-        cpp.staticLibraries: ["sharedmem","shmobank"]
+        cpp.staticLibraries: ["shmobank","sharedmem","shmobank"]
         Group {
             name: "headers"
             qbs.install: true

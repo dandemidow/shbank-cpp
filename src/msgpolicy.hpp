@@ -1,7 +1,9 @@
 #ifndef _MSGPOLICY_H_
 #define _MSGPOLICY_H_
+#include <memory>
 
 #include "msgerrors.hpp"
+#include "memory.hpp"
 
 namespace msg {
 
@@ -43,17 +45,11 @@ namespace msg {
   };
 
   struct MsgBasic {
-    MsgBasic(const shared_mem_t *const mem, const msg_bank_t *const bank) :
+    MsgBasic(std::shared_ptr<shared_mem_t> mem, const msg_bank_t *const bank) :
       mem(mem), bank(bank) {}
   protected:
-    const shared_mem_t *const mem;
+    std::shared_ptr<shared_mem_t> mem;
     const msg_bank_t *const bank;
-    bool check(error &err)
-    {
-        bool res = mem != nullptr && bank != nullptr;
-        err.set(res ? error::success : error::bank_not_init);
-        return res;
-    }
   };
 
   struct MsgPolicy : public MsgBasic {
@@ -61,58 +57,58 @@ namespace msg {
     typedef msgblk_t(MsgPolicy::*PopType)(error&);
 
     // push
-    bool push(error &err, const msgblk_t &msg) noexcept {
+    bool push(error &err, const msgblk_t &msg) throw(memory_deleted_exception) {
       return push(err,msg,0);
     }
-    bool push(const msgblk_t &msg) throw(exception) {
+    bool push(const msgblk_t &msg) throw(exception,memory_deleted_exception) {
       return _add_exception::exc<PushType>(this, &MsgPolicy::push, msg);
     }
 
-    bool push_test(error &err, const msgblk_t &msg) noexcept{
+    bool push_test(error &err, const msgblk_t &msg) throw(memory_deleted_exception){
         return push(err,msg,1);
     }
 
-    bool push_test(const msgblk_t &msg) {
+    bool push_test(const msgblk_t &msg) throw(exception,memory_deleted_exception) {
       return _add_exception::exc<PushType>(this, &MsgPolicy::push_test, msg);
     }
 
     // pop
-    msgblk_t pop(error &err) noexcept {
+    msgblk_t pop(error &err) throw(memory_deleted_exception) {
       return pop(err,0);
     }
-    msgblk_t pop_test(error &err) noexcept {
+    msgblk_t pop_test(error &err) throw(memory_deleted_exception) {
       return pop(err,1);
     }
 
-    msgblk_t pop() throw(exception) {
+    msgblk_t pop() throw(exception,memory_deleted_exception) {
       return _add_exception::exc<PopType>(this, &MsgPolicy::pop);
     }
 
-    msgblk_t pop_test() {
+    msgblk_t pop_test() throw(exception,memory_deleted_exception){
       return _add_exception::exc<PopType>(this, &MsgPolicy::pop_test);
     }
 
-    MsgPolicy(const shared_mem_t *const mem, const msg_bank_t *const bank) : MsgBasic(mem, bank) {}
+    MsgPolicy(std::shared_ptr<shared_mem_t> mem, const msg_bank_t *const bank) : MsgBasic(mem, bank) {}
 
   private:
-    msgblk_t pop(error& err,int num)
+    msgblk_t pop(error& err,int num) throw(memory_deleted_exception)
     {
-        auto res = check(err);
-        if(!res)return msgblk_t();
+        if(!mem)
+            throw(memory_deleted_exception());
         int status;
-        auto msg = pop_msg(mem, bank, num, &status);
+        auto msg = pop_msg(mem.get(), bank, num, &status);
         err.set(status);
         if(msg == nullptr)
             return msgblk_t();
         auto obj = *msg;
-        free_msg(mem, msg);
+        free_msg(mem.get(), msg);
         return obj;
     }
-    bool push(error &err,const msgblk_t &msg,int num)
+    bool push(error &err,const msgblk_t &msg,int num)throw(memory_deleted_exception)
     {
-        auto res = check(err);
-        if(!res)return false;
-        int result = push_msg_copy(mem, bank, const_cast<msgblk_t*>(&msg), num);
+        if(!mem)
+            throw(memory_deleted_exception());
+        int result = push_msg_copy(mem.get(), bank, const_cast<msgblk_t*>(&msg), num);
         err.set(result);
         return result >= 0;
     }
@@ -123,72 +119,74 @@ namespace msg {
     typedef msgblk_t*(MsgPolicyRaw::*PopType)(error&);
 
     // push
-    bool push(error &err, msgblk_t *msg) noexcept {
+    bool push(error &err, msgblk_t *msg) throw(memory_deleted_exception) {
         return push(err,msg,0);
     }
-    bool push(msgblk_t *msg) throw(exception) {
+    bool push(msgblk_t *msg) throw(exception,memory_deleted_exception) {
       return _add_exception::exc<PushType>(this, &MsgPolicyRaw::push, msg);
     }
 
-    bool push_test(error &err, msgblk_t *msg) noexcept{
+    bool push_test(error &err, msgblk_t *msg) throw(memory_deleted_exception){
       return push(err,msg,1);
     }
 
-    bool push_test(msgblk_t *msg) {
+    bool push_test(msgblk_t *msg) throw(exception,memory_deleted_exception) {
       return _add_exception::exc<PushType>(this, &MsgPolicyRaw::push_test, msg);
     }
 
     // prep
-    msgblk_t *prep(error &err) noexcept {
-      auto res = check(err);
-      if(!res)return nullptr;
+    msgblk_t *prep(error &err) throw(memory_deleted_exception) {
+        if(!mem)
+            throw(memory_deleted_exception());
       int status;
-      auto msg = prep_msg(mem, &status);
+      auto msg = prep_msg(mem.get(), &status);
       err.set(status);
       return msg;
     }
 
-    msgblk_t *prep() throw(exception) {
+    msgblk_t *prep()throw(exception,memory_deleted_exception){
       return _add_exception::exc<PopType>(this, &MsgPolicyRaw::prep);
     }
 
     // pop
-    msgblk_t *pop(error &err) noexcept {
+    msgblk_t *pop(error &err) throw(memory_deleted_exception) {
         return pop(err,0);
     }
-    msgblk_t *pop_test(error &err) noexcept {
+    msgblk_t *pop_test(error &err) throw(memory_deleted_exception) {
         return pop(err,1);
     }
 
     typedef msgblk_t*(MsgPolicy::*PopPtrType)(error&);
 
-    msgblk_t *pop() throw(exception) {
+    msgblk_t *pop() throw(exception,memory_deleted_exception) {
       return _add_exception::exc<PopType>(this, &MsgPolicyRaw::pop);
     }
 
-    msgblk_t *pop_test() {
+    msgblk_t *pop_test() throw(exception,memory_deleted_exception) {
       return _add_exception::exc<PopType>(this, &MsgPolicyRaw::pop_test);
     }
 
-    void free(msgblk_t *msg) noexcept {
-      if ( msg ) free_msg(mem, msg);
+    void free(msgblk_t *msg) throw(memory_deleted_exception) {
+        if(!mem)
+            throw(memory_deleted_exception());
+      if ( msg ) free_msg(mem.get(), msg);
     }
 
-    MsgPolicyRaw(const shared_mem_t *const mem, const msg_bank_t *const bank) : MsgBasic(mem, bank) {}
+    MsgPolicyRaw(std::shared_ptr<shared_mem_t> mem, const msg_bank_t *const bank) : MsgBasic(mem, bank) {}
   private:
     msgblk_t *pop(error &err,int num)
     {
-        auto res = check(err);
-        if(!res)return nullptr;
+        if(!mem)
+            throw(memory_deleted_exception());
         int status;
-        auto msg = pop_msg(mem, bank, num, &status);
+        auto msg = pop_msg(mem.get(), bank, num, &status);
         err.set(status);
         return msg;
     }
-    bool push(error &err, msgblk_t *msg,int num) noexcept{
-      auto res = check(err);
-      if(!res)return false;
-      int result = push_msg(mem, bank, msg, num);
+    bool push(error &err, msgblk_t *msg,int num) throw(memory_deleted_exception){
+        if(!mem)
+            throw(memory_deleted_exception());
+      int result = push_msg(mem.get(), bank, msg, num);
       err.set(result);
       return result >= 0;
     }
