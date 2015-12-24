@@ -20,6 +20,7 @@ class bank : public msg::trait<Message>::type {
   typedef typename msg::trait<Message>::type msgpolicy;
   bank(std::shared_ptr<shared_mem_t*> _m, const msg_bank_t *const _b) :
     msgpolicy(_m, _b), mem(_m), _bank(_b) {}
+
 public:
   bank(const bank &) = delete;
   bank(bank &&obj):
@@ -30,33 +31,25 @@ public:
           at_exit(mem, const_cast<msg_bank_t*>(_bank));
   }
   template <class User>
-  static bank create(std::shared_ptr<shared_mem_t*>_mem, special_bank_tags tag, int count = 2, typename std::enable_if<std::is_same<User, Producer>::value>::type * = nullptr) {
+  static bank create(std::shared_ptr<shared_mem_t*>mem, special_bank_tags tag, int count = 2, typename std::enable_if<std::is_same<User, Producer>::value>::type * = nullptr) {
+    using userbank = typename shm::trait<User>::type::bank;
     int _tag = tag == special_bank_tags::playback?Playback:Capture;
-    const msg_bank_t *const _b = init_msg_bank(*_mem.get(), count, _tag);
+    const msg_bank_t *const _b = userbank::init(mem, _tag, count);
     if(!_b)
         throw(init_bank_exception());
-    bank &&tmp = std::move(bank(_mem, _b));
-    tmp.at_exit = [](std::shared_ptr<shared_mem_t*> mem, msg_bank_t *b)
-    {
-        if(*mem.get() != nullptr)
-            free_msg_bank(*mem.get(), b);
-    };
+    bank &&tmp = std::move(bank(mem, _b));
+    tmp.at_exit = std::bind(userbank::defer, std::placeholders::_1, std::placeholders::_2);
     return std::move(tmp);
   }
 
   template <class User>
   static bank create(std::shared_ptr<shared_mem_t*> mem, special_bank_tags tag, int count = 0, typename std::enable_if<std::is_same<User, Consumer>::value>::type * = nullptr) {
-    (void)(count);
     int _tag = tag == special_bank_tags::playback?Playback:Capture;
-    msg_bank_t *_b = join_msg_bank(*mem.get(), _tag);
+    msg_bank_t *_b = shm::trait<User>::type::bank::init(mem, _tag, count);
     if(!_b)
         throw(init_bank_exception());
     bank &&tmp = std::move(bank(mem, _b));
-    tmp.at_exit = [](std::shared_ptr<shared_mem_t*>mem, msg_bank_t *b)
-    {
-        if(*mem.get() != nullptr)
-            unjoin_msg_bank(b);
-    };
+    tmp.at_exit = std::bind(shm::trait<User>::type::bank::defer, std::placeholders::_1, std::placeholders::_2);
     return std::move(tmp);
   }
 
