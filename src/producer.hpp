@@ -4,15 +4,28 @@
 #include <memory>
 
 #include "user_types.hpp"
+#include "resolver.h"
+#include "buferrors.hpp"
 
 extern "C" {
 #include <shmobank/monmsg.h>
 }
 namespace shm {
 struct producer {
-  shared_mem_t *init(const std::string &name) {
-    // FIXME put status instead NULL
-    return open_shared_banks(const_cast<char*>(name.c_str()), NULL);
+  typedef shared_mem_t*(producer::*InitType)(error&,const std::string&);
+  typedef error ErrorType;
+  typedef exception ExceptionType;
+  typedef producer SelfType;
+
+  shared_mem_t *init(error &err,const std::string &name) {
+    int status;
+    auto shm = open_shared_banks(const_cast<char*>(name.c_str()), &status);
+    err.set(status);
+    return shm;
+  }
+  shared_mem_t *init(const std::string &name) throw(ExceptionType)
+  {
+      return _add_exception::exc<InitType,SelfType,ErrorType,ExceptionType,decltype(name)>(this,&SelfType::init,name);
   }
   void exit(shared_mem_t *mem) { close_shared_banks(mem); }
 

@@ -14,12 +14,14 @@ Project {
             prefix: "src/"
             files: [
                 "bank.hpp",
+                "buferrors.hpp",
                 "memory.hpp",
+                "resolver.h",
                 "user_types.hpp",
                 "msgpolicy.hpp",
                 "msgerrors.hpp",
                 "producer.hpp",
-                "consumer.hpp"
+                "consumer.hpp",
             ]
         }
         Group {

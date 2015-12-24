@@ -30,7 +30,7 @@ public:
       if (at_exit)
           at_exit(mem, const_cast<msg_bank_t*>(_bank));
   }
-  template <class User>
+  /*template <class User>
   static bank create(std::shared_ptr<shared_mem_t*>mem, special_bank_tags tag, int count = 2, typename std::enable_if<std::is_same<User, Producer>::value>::type * = nullptr) {
     using userbank = typename shm::trait<User>::type::bank;
     int _tag = tag == special_bank_tags::playback?Playback:Capture;
@@ -40,42 +40,43 @@ public:
     bank &&tmp = std::move(bank(mem, _b));
     tmp.at_exit = std::bind(userbank::defer, std::placeholders::_1, std::placeholders::_2);
     return std::move(tmp);
-  }
+  }*/
 
   template <class User>
-  static bank create(std::shared_ptr<shared_mem_t*> mem, special_bank_tags tag, int count = 0, typename std::enable_if<std::is_same<User, Consumer>::value>::type * = nullptr) {
+  static bank create(std::shared_ptr<shared_mem_t*> mem, special_bank_tags tag, int count = 2) {
+    using userbank = typename shm::trait<User>::type::bank;
     int _tag = tag == special_bank_tags::playback?Playback:Capture;
     msg_bank_t *_b = shm::trait<User>::type::bank::init(mem, _tag, count);
     if(!_b)
         throw(init_bank_exception());
     bank &&tmp = std::move(bank(mem, _b));
-    tmp.at_exit = std::bind(shm::trait<User>::type::bank::defer, std::placeholders::_1, std::placeholders::_2);
+    tmp.at_exit = std::bind(userbank::defer, std::placeholders::_1, std::placeholders::_2);
     return std::move(tmp);
   }
 
   void activate() throw(memory_deleted_exception){
-    if(*mem.get() == nullptr)
+    if(! *mem)
         throw(memory_deleted_exception());
     active_msg_bank(const_cast<msg_bank_t *const>(_bank));
   }
   void deactivate() throw(memory_deleted_exception){
-      if(*mem.get() == nullptr)
+      if(! *mem)
           throw(memory_deleted_exception());
     deactive_msg_bank(const_cast<msg_bank_t *const>(_bank));
   }
   void wait_activating() throw(memory_deleted_exception){
-      if(*mem.get() == nullptr)
+      if(! *mem)
           throw(memory_deleted_exception());
     wait_bank_activate(_bank);
   }
   bool is_active() const throw(memory_deleted_exception) {
-      if(*mem.get() == nullptr)
+      if(! *mem)
           throw(memory_deleted_exception());
     return is_active_bank(_bank);
   }
 
   bool wait_timeout_activating(int seconds) throw(memory_deleted_exception){
-      if(*mem.get() == nullptr)
+      if(! *mem)
           throw(memory_deleted_exception());
       return wait_timeout_bank_activate(_bank,seconds) == 0;
   }
