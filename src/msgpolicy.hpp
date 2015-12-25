@@ -4,7 +4,7 @@
 
 #include "msgerrors.hpp"
 #include "memory.hpp"
-#include "resolver.h"
+#include "exceptionizer.hpp"
 
 namespace msg {
 
@@ -14,7 +14,6 @@ namespace msg {
   protected:
     std::shared_ptr<shared_mem_t*> mem;
     const msg_bank_t *const bank;
-    typedef error ErrorType;
     typedef exception ExceptionType;
   };
 
@@ -28,7 +27,7 @@ namespace msg {
       return push(err,msg,0);
     }
     bool push(const msgblk_t &msg) throw(exception,memory_deleted_exception) {
-      return _add_exception::exc<PushType,MsgPolicy,ErrorType,ExceptionType,decltype(msg)>(this, &MsgPolicy::push, msg);
+      return _add_exception::exc<PushType,ExceptionType,decltype(msg)>(this, &MsgPolicy::push, msg);
     }
 
     bool push_test(error &err, const msgblk_t &msg) throw(memory_deleted_exception){
@@ -36,7 +35,7 @@ namespace msg {
     }
 
     bool push_test(const msgblk_t &msg) throw(exception,memory_deleted_exception) {
-      return _add_exception::exc<PushType,MsgPolicy,ErrorType,ExceptionType,decltype(msg)>(this, &MsgPolicy::push_test, msg);
+      return _add_exception::exc<PushType,ExceptionType,decltype(msg)>(this, &MsgPolicy::push_test, msg);
     }
 
     // pop
@@ -48,11 +47,11 @@ namespace msg {
     }
 
     msgblk_t pop() throw(exception,memory_deleted_exception) {
-      return _add_exception::exc<PopType,MsgPolicy,ErrorType,ExceptionType>(this, &MsgPolicy::pop);
+      return _add_exception::exc<PopType,ExceptionType>(this, &MsgPolicy::pop);
     }
 
     msgblk_t pop_test() throw(exception,memory_deleted_exception){
-      return _add_exception::exc<PopType,MsgPolicy,ErrorType,ExceptionType>(this, &MsgPolicy::pop_test);
+      return _add_exception::exc<PopType,ExceptionType>(this, &MsgPolicy::pop_test);
     }
 
     MsgPolicy(std::shared_ptr<shared_mem_t*> mem, const msg_bank_t *const bank) : MsgBasic(mem, bank) {}
@@ -90,7 +89,7 @@ namespace msg {
         return push(err,msg,0);
     }
     bool push(msgblk_t *msg) throw(exception,memory_deleted_exception) {
-      return _add_exception::exc<PushType,MsgPolicyRaw,ErrorType,ExceptionType>(this, &MsgPolicyRaw::push, msg);
+      return _add_exception::exc<PushType,ExceptionType>(this, &MsgPolicyRaw::push, msg);
     }
 
     bool push_test(error &err, msgblk_t *msg) throw(memory_deleted_exception){
@@ -98,7 +97,7 @@ namespace msg {
     }
 
     bool push_test(msgblk_t *msg) throw(exception,memory_deleted_exception) {
-      return _add_exception::exc<PushType,MsgPolicyRaw,ErrorType,ExceptionType>(this, &MsgPolicyRaw::push_test, msg);
+      return _add_exception::exc<PushType,ExceptionType>(this, &MsgPolicyRaw::push_test, msg);
     }
 
     // prep
@@ -112,7 +111,7 @@ namespace msg {
     }
 
     msgblk_t *prep()throw(exception,memory_deleted_exception){
-      return _add_exception::exc<PopType,MsgPolicyRaw,ErrorType,ExceptionType>(this, &MsgPolicyRaw::prep);
+      return _add_exception::exc<PopType,ExceptionType>(this, &MsgPolicyRaw::prep);
     }
 
     // pop
@@ -126,11 +125,11 @@ namespace msg {
     typedef msgblk_t*(MsgPolicy::*PopPtrType)(error&);
 
     msgblk_t *pop() throw(exception,memory_deleted_exception) {
-      return _add_exception::exc<PopType,MsgPolicyRaw,ErrorType,ExceptionType>(this, &MsgPolicyRaw::pop);
+      return _add_exception::exc<PopType,ExceptionType>(this, &MsgPolicyRaw::pop);
     }
 
     msgblk_t *pop_test() throw(exception,memory_deleted_exception) {
-      return _add_exception::exc<PopType,MsgPolicyRaw,ErrorType,ExceptionType>(this, &MsgPolicyRaw::pop_test);
+      return _add_exception::exc<PopType,ExceptionType>(this, &MsgPolicyRaw::pop_test);
     }
 
     void free(msgblk_t *msg) throw(memory_deleted_exception) {

@@ -30,17 +30,6 @@ public:
       if (at_exit)
           at_exit(mem, const_cast<msg_bank_t*>(_bank));
   }
-  /*template <class User>
-  static bank create(std::shared_ptr<shared_mem_t*>mem, special_bank_tags tag, int count = 2, typename std::enable_if<std::is_same<User, Producer>::value>::type * = nullptr) {
-    using userbank = typename shm::trait<User>::type::bank;
-    int _tag = tag == special_bank_tags::playback?Playback:Capture;
-    const msg_bank_t *const _b = userbank::init(mem, _tag, count);
-    if(!_b)
-        throw(init_bank_exception());
-    bank &&tmp = std::move(bank(mem, _b));
-    tmp.at_exit = std::bind(userbank::defer, std::placeholders::_1, std::placeholders::_2);
-    return std::move(tmp);
-  }*/
 
   template <class User>
   static bank create(std::shared_ptr<shared_mem_t*> mem, special_bank_tags tag, int count = 2) {

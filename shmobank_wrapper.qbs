@@ -16,7 +16,7 @@ Project {
                 "bank.hpp",
                 "buferrors.hpp",
                 "memory.hpp",
-                "resolver.h",
+                "exceptionizer.hpp",
                 "user_types.hpp",
                 "msgpolicy.hpp",
                 "msgerrors.hpp",
