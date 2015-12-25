@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(TestConsumerJoinException) {
     BOOST_FAIL("Comsumer was created without Producer");
     auto playbank = mem.create<shmobank::bank>(shmobank::tags::playback);
   }
-  catch(bad_memory_exception e) {
+  catch(shm::exception e) {
     exc = true;
   }
   BOOST_REQUIRE(exc);
